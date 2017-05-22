@@ -35,13 +35,14 @@ void showTracks()
 
   int a;
   double z[3]={354,161+354,10639+354+161};// z-coord of all planes
-  //double ze[3]={0};
+  double ze[3]={0};
   
   double x[3]={0};
+  double xe[3]={0.5/sqrt(12),0.5/sqrt(12),0.5/sqrt(12)};
   //double xe[3]={0};
 
   double y[3]={0};
-  //double ye[3]={0};
+  double ye[3]={0.5/sqrt(12),0.5/sqrt(12),0.5/sqrt(12)};
   
   TFile * file = TFile::Open(fileName,"READ");
   if (!file) { return; }
@@ -62,21 +63,17 @@ void showTracks()
   int i=0;
   do{
     double x2, x3, x4,y2,y3,y4;
-    TGraph *gx,*gy;
+    TGraphErrors *gx,*gy;
     Long64_t tentry = tree->LoadTree(i);
-    bHits2x->GetEntry(tentry);    
-    for (UInt_t j = 0; j < Hits2x->size(); ++j)
-      {
-	//if(Hits2x->size()==1)
-	cout<<"Event #:" <<i+1<< " 2x = "<<Hits2x->at(0)<<"\n";
-	x2=Hits2x->at(0);
-	if(Hits2x->size()>1)break;	
-      }
+    bHits2x->GetEntry(tentry);
+    int multi2x = Hits2x->size();
 
     TBranch *bHits2y = 0;
     tree->SetBranchAddress("Hits2y",&Hits2y, &bHits2y);
+    int multi2y = Hits2y->size();
     
     bHits2y->GetEntry(tentry);
+    /*
     for (UInt_t j = 0; j < Hits2y->size(); ++j) {
       //if(Hits2y->size()==1)
       //cout<<"Event #:" <<i+1<< " 2y = "<<Hits2y->at(0)<<"\n";
@@ -87,92 +84,99 @@ void showTracks()
      
      
     }
-   
+    */
     TBranch *bHits3x = 0;
     tree->SetBranchAddress("Hits3x",&Hits3x, &bHits3x);
     bHits3x->GetEntry(tentry);
-     for (UInt_t j = 0; j < Hits3x->size(); ++j) {
-       //if(Hits3x->size()==1)
-       cout<<"Event #:" <<i+1<< " 3x = "<<Hits3x->at(0)<<"\n";
-       x3=Hits3x->at(0);
-       if(Hits3x->size()>1)break;
-     }
-
+    int multi3x = Hits3x->size();
+     
      
      TBranch *bHits3y = 0;
      tree->SetBranchAddress("Hits3y",&Hits3y, &bHits3y);
      bHits3y->GetEntry(tentry);
+     int multi3y = Hits3y->size();
+     /*
      for (UInt_t j = 0; j < Hits3y->size(); ++j) {
        //if(Hits3y->size()==1)
        //cout<<"Event #:" <<i+1<< " 3y = "<<Hits3y->at(0)<<"\n";
        y3=Hits3y->at(0);
        if(Hits3y->size()>1)break;
      }
-
+     */
+     
      TBranch *bHits4x = 0;
      tree->SetBranchAddress("Hits4x",&Hits4x, &bHits4x);
      bHits4x->GetEntry(tentry);
-     for (UInt_t j = 0; j < Hits4x->size(); ++j) {
-       //if(Hits4x->size()==1)
-       cout<<"Event #:" <<i+1<< " 4x = "<<Hits4x->at(0)<<"\n";
-       x4=Hits4x->at(0);
-       if(Hits4x->size()>1)break;
-     }
-
+     int multi4x = Hits4x->size();
      
      TBranch *bHits4y = 0;
      tree->SetBranchAddress("Hits4y",&Hits4y, &bHits4y);
      bHits4y->GetEntry(tentry);
+     int multi4y = Hits4y->size();
+     /*
      for (UInt_t j = 0; j < Hits4y->size(); ++j) {
        //if(Hits4y->size()==1)
        //cout<<"Event #:" <<i+1<< " 4y = "<<Hits4y->at(0)<<"\n";
        y4=Hits4y->at(0);
        if(Hits4y->size()>1)break;
      }
+     */
+
+
      
-     if(Hits3y->size()>0){
+     if(multi2x==1 && multi3x==1){
+       
+       for (UInt_t j = 0; j < Hits2x->size(); ++j)
+	 {
+	   //if(Hits2x->size()==1)
+	   //cout<<"Event #:" <<i+1<< " 2x = "<<Hits2x->at(0)<<"\n";
+	   x2=Hits2x->at(0);
+	   if(Hits2x->size()>1)break;	
+	 }
+       for (UInt_t j = 0; j < Hits3x->size(); ++j) {
+	 //if(Hits3x->size()==1)
+	 //cout<<"Event #:" <<i+1<< " 3x = "<<Hits3x->at(0)<<"\n";
+	 x3=Hits3x->at(0);
+	 if(Hits3x->size()>1)break;
+       }
+
+       for (UInt_t j = 0; j < Hits4x->size(); ++j) {
+	 //if(Hits4x->size()==1)
+	 //cout<<"Event #:" <<i+1<< " 4x = "<<Hits4x->at(0)<<"\n";
+	 x4=Hits4x->at(0);
+	 if(Hits4x->size()>1)break;
+       }
+
        x[0]=x2;
        //x[1]=x3/sqrt(2)+y3/sqrt(2);
        x[1]=x3;
        x[2]=x4;
-       y[0]=y2; y[1]=y3; y[2]=y4;
-
-       gx=new TGraph(3,z,x);
-       gx->SetMarkerStyle(21);
-       gx->SetTitle("Tracks from X vs. Z");
+       //y[0]=y2; y[1]=y3; y[2]=y4;
        
-       gy=new TGraph(3,z,y);
+       gx=new TGraphErrors(3,z,x,ze,xe);
+       gx->SetMarkerStyle(21);
+       //gx->SetTitle("Tracks from X vs. Z");
+       gx->SetTitle("x = p_{0} + p_{1}z");
+       gx->GetXaxis()->SetTitle("Z plane positions (mm)");
+       gx->GetYaxis()->SetTitle("X hit coordinates (mm)");
+
+       
+       gy=new TGraphErrors(3,z,y,ze,ye);
        gy->SetMarkerStyle(kFullStar);
-        gy->SetMarkerSize(1.2);
+       gy->SetMarkerSize(1.2);
        gy->SetTitle("Tracks from Y vs. Z");
        TF1 *f3 = new TF1("f3", "pol1");
 
-       gx->Fit("f3","Q");
+       gx->Fit("f3");
        double slopeX = f3->GetParameter(1);
        double chi2X = f3->GetChisquare();
-              
+       
        gy->Fit("f3","Q");
        double slopeY = f3->GetParameter(1);
        double chi2Y = f3->GetChisquare(); 
        //cout<<"Event #:" <<i+1<<" Inverse tan "<<atan((y2-y1)/(161-y2))<<"\n";
-       /*      
-       if(chi2X<1){
-	 hThetaOut_x->Fill(slopeX);
-	 hChi2_x->Fill(chi2X);
-       }
-
-       if(chi2Y<1){
-	 hThetaOut_y->Fill(slopeY);
-	 hChi2_y->Fill(chi2Y);
-	 }*/
-       // gx->Draw();
-       //c1->Update();
-      
-       //a=getchar();  
-       //if (gSystem->ProcessEvents())
-       //break;
        
-       if(chi2X<1){
+       //if(chi2X<1){
 	 gx->Draw();
 	 gStyle->SetOptFit(1);
 	 c1->Update();
@@ -180,8 +184,8 @@ void showTracks()
       
 	 a=getchar();
 	 printf("Next track. Enter '.' or 'ctrl+c' to exit \n");
+	 //}
        }
-     }
       i++;
   }while(a !='.');
   /*
