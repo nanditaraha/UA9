@@ -1,4 +1,4 @@
-# UA9 Experiment - event reconstruction and tracking.
+# UA9 Experiment - event reconstruction and track formation.
 The goal is to recontruct particle hits (or events from detector triggers) into tracks by combining clusters of track candidates.
 This expt. Is used to channel charged particles in a bent crystal to steer ultra-rel. beams with high efficiency and better collimation. 
 Crystal used: Quasi-Mosaic crystal (silicon). 
